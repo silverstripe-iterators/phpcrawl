@@ -96,6 +96,8 @@ class PHPCrawlerURLFilter
       }
     }
     
+    $this->CurrentDocumentInfo = null;
+    
     PHPCrawlerBenchmark::stop("filtering_urls");
   }
   

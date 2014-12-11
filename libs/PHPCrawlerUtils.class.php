@@ -162,6 +162,9 @@ class PHPCrawlerUtils
       }
     }
     
+    // If path is just a "/" -> remove it ("www.site.com/" -> "www.site.com")
+    if ($url_parts["path"] == "/" && $url_parts["file"] == "" && $url_parts["query"] == "") $url_parts["path"] = "";
+    
     // Put together the url
     $url = $url_parts["protocol"] . $auth_part . $url_parts["host"]. $port_part . $url_parts["path"] . $url_parts["file"] . $url_parts["query"];
     
@@ -488,7 +491,7 @@ class PHPCrawlerUtils
   } 
   
   /**
-   * Serializes data (objects, arrayse etc.) and writes it to the given file.
+   * Serializes data (objects, arrays etc.) and writes it to the given file.
    */
   public static function serializeToFile($target_file, $data)
   {
@@ -567,11 +570,8 @@ class PHPCrawlerUtils
    */
   public static function getSystemTempDir()
   {
-    $tmpfile = tempnam("dummy","");
-    $path = dirname($tmpfile);
-    unlink($tmpfile);
-    
-    return $path."/";
+    $dir = sys_get_temp_dir()."/";
+    return $dir;
   }
   
   /**
@@ -631,6 +631,29 @@ class PHPCrawlerUtils
   { 
     if (preg_match("#^[a-z0-9/.&=?%-_.!~*'()]+$# i", $string)) return true;
     else return false;
+  }
+  
+  /**
+   * Decodes GZIP-encoded HTTP-data
+   */
+  public static function decodeGZipContent($content)
+  {
+    return gzinflate(substr($content, 10, -8));
+  }
+  
+  /**
+   * Checks whether the given data is gzip-encoded
+   */
+  public static function isGzipEncoded($content)
+  {
+    if(substr($content, 0, 3) == "\x1f\x8b\x08")
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
 }
 ?>
